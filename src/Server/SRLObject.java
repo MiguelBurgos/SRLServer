@@ -5,9 +5,8 @@
  */
 package Server;
 
-import SRL.IRemoteSRL;
-import SRL.Seat;
-import SRL.Spectacle;
+import SRL.*;
+
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -25,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class SRLObject extends UnicastRemoteObject implements IRemoteSRL{
 
-    private static final long serialVersionUID = 11L;
+    private static final long serialVersionUID = 1L;
 
     private Registry registry;
     private IRemoteSRL srl;
@@ -34,7 +33,7 @@ public class SRLObject extends UnicastRemoteObject implements IRemoteSRL{
         super();
         try {
             registry = LocateRegistry.getRegistry("127.0.0.1");
-            srl = (IRemoteSRL) registry.lookup("SRLRepository");
+            srl = (IRemoteSRL) registry.lookup("SRLDB");
         } catch (NotBoundException ex) {
             Logger.getLogger(SRLObject.class.getName()).log(Level.SEVERE, null, ex);
         } catch (AccessException ex) {
@@ -84,6 +83,63 @@ public class SRLObject extends UnicastRemoteObject implements IRemoteSRL{
             snae.printStackTrace();
         }
         return srl.readSeats(s);
+    }
+
+    @Override
+    public boolean removeSession() throws RemoteException {
+        String clientIP = null;
+        try {
+            clientIP = getClientHost();
+        } catch (ServerNotActiveException ex) {
+            Logger.getLogger(SRLObject.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return Session.remove(clientIP);
+    }
+    
+    @Override
+    public boolean addSession(Spectacle s) throws RemoteException {
+        String clientIP = null;
+        try {
+            clientIP = getClientHost();
+        } catch (ServerNotActiveException ex) {
+            Logger.getLogger(SRLObject.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        return Session.add(clientIP, s);
+    }
+    
+    @Override
+    public List<Seat> getSelectedSeats(Spectacle s) throws RemoteException {
+        try {
+            return Session.getSelectedSeats(getClientHost(), s);
+        } catch (ServerNotActiveException ex) {
+            Logger.getLogger(SRLObject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Seat> getSoldSeats(Spectacle s) throws RemoteException {
+        return Session.getSoldSeats(s);
+    }
+
+    @Override
+    public void setSelectedSeats(List<Seat> seats) throws RemoteException {
+        try {
+            Session.getSession(getClientHost()).setSelected(seats);
+        } catch (ServerNotActiveException ex) {
+            Logger.getLogger(SRLObject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public void setSoldSeats(List<Seat> seats) throws RemoteException {
+        try {
+            Session.getSession(getClientHost()).setSold(seats);
+        } catch (ServerNotActiveException ex) {
+            Logger.getLogger(SRLObject.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

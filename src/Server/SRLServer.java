@@ -26,7 +26,7 @@ public class SRLServer {
             // Iniciate server object
             SRLObject srl = new SRLObject();
             //Register server object
-            registry.rebind("SRL", srl);
+            registry.rebind("SRLServer", srl);
             System.out.println("SRLServer is created!!!");
 
         } catch (Exception e) {

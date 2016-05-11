@@ -22,5 +22,17 @@ public interface IRemoteSRL extends Remote{
     public int updateSeat(Spectacle sp, Seat se) throws RemoteException;
 
     public Spectacle readSeats(Spectacle s) throws RemoteException;
+    
+    public boolean removeSession() throws RemoteException;
+    
+    public boolean addSession(Spectacle s) throws RemoteException;
+    
+    public List<Seat> getSelectedSeats(Spectacle s) throws RemoteException;
+
+    public List<Seat> getSoldSeats(Spectacle s) throws RemoteException;
+    
+    public void setSelectedSeats(List<Seat> seats) throws RemoteException;
+    
+    public void setSoldSeats(List<Seat> seats) throws RemoteException;
 
 }
